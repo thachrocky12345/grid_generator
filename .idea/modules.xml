@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../elecsys_database/.idea/elecsys_database.iml" filepath="$PROJECT_DIR$/../elecsys_database/.idea/elecsys_database.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/grid_generator.iml" filepath="$PROJECT_DIR$/.idea/grid_generator.iml" />
     </modules>
   </component>
