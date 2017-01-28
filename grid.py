@@ -54,31 +54,30 @@ class Grids(object):
         if self._grids is not None:
             return self._grids
 
-        self._grids = self.get_point(self.min_long, self.min_lat)
+        self._grids = self.get_point(self.min_long, self.max_lat)
         return self._grids
 
 
     def get_point(self, long, lat, points=None):
         """
         Collect all the points
-        :param long:
-        :param lat:
+        :param long: from left to right
+        :param lat: from up to down
         :param points:
-        :return: list of all points
+        :return: list of all grids
         """
 
         if points == None:
             points = []
 
-        while long <= self.max_long:
+        while lat >= self.min_lat:
+            while long <= self.max_long:
+                points.append(Grid(long, lat))
+                long += LONGITUDE_DISTANCE
+            long = self.min_long
+            lat -= LATITUDE_DISTANCE
 
-            while lat <= self.max_lat:
-                points.append([long, lat])
-                lat += LATITUDE_DISTANCE
-            lat = self.min_lat
-            long += LONGITUDE_DISTANCE
-
-        points.append([self.max_long, self.max_lat])
+        points.append(Grid(self.max_long, self.max_lat))
         return points
 
 
