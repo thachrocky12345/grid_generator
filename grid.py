@@ -27,7 +27,7 @@ class Grid(object):
                      max_lat=self.lat + LATITUDE_DISTANCE/2)
         return '''st_setsrid(
                              'POLYGON(({min_long} {max_lat},{max_long} {max_lat},{max_long} {min_lat},{min_long} {min_lat},{min_long} {max_lat}))'::geometry
-                              , 4326))'''.format(**input)
+                              , 4326)'''.format(**input)
 
 
 class Grids(object):
@@ -70,7 +70,7 @@ class Grids(object):
         if points == None:
             points = []
 
-        while lat >= self.min_lat:
+        while lat >= self.min_lat   :
             while long <= self.max_long:
                 points.append(Grid(long, lat))
                 long += LONGITUDE_DISTANCE
