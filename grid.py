@@ -4,8 +4,30 @@ sys.path.append("/home/thachbui/workstation/elecsys_database")
 from database import PgPass, PgsqlExecutor
 
 
-LONGITUDE_DISTANCE = 0.000006
-LATITUDE_DISTANCE = 0.0000045
+LONGITUDE_DISTANCE = 0.00006
+LATITUDE_DISTANCE = 0.000045
+
+
+class Grid(object):
+    def __init__(self, longitude, latitude):
+        self.long = longitude
+        self.lat = latitude
+
+    @property
+    def point_sql(self):
+        return '''st_setsrid(
+                            st_point({long}, {lat})
+                            , 4326)'''.format(long=self.long, lat=self.lat)
+
+    @property
+    def polygon_sql(self):
+        input = dict(min_long=self.long - LONGITUDE_DISTANCE/2,
+                     max_long=self.long + LONGITUDE_DISTANCE/2,
+                     min_lat=self.lat - LATITUDE_DISTANCE/2,
+                     max_lat=self.lat + LATITUDE_DISTANCE/2)
+        return '''st_setsrid(
+                             'POLYGON(({min_long} {max_lat},{max_long} {max_lat},{max_long} {min_lat},{min_long} {min_lat},{min_long} {max_lat}))'::geometry
+                              , 4326))'''.format(**input)
 
 
 class Grids(object):
@@ -46,16 +68,15 @@ class Grids(object):
         """
 
         if points == None:
-            points = [[self.min_long, self.min_lat]]
+            points = []
 
-        while long <= self.max_long and lat <= self.max_lat:
-            if long <= self.max_long:
-                long += LONGITUDE_DISTANCE
+        while long <= self.max_long:
+
+            while lat <= self.max_lat:
                 points.append([long, lat])
-
-            if lat <= self.max_lat:
                 lat += LATITUDE_DISTANCE
-                points.append([long, lat])
+            lat = self.min_lat
+            long += LONGITUDE_DISTANCE
 
         points.append([self.max_long, self.max_lat])
         return points
