@@ -50,16 +50,20 @@ class Grids(object):
 
 
     @property
+    def my_proj(self):
+        return pyproj.Proj("+proj=utm +lat_0={lat} +lon_0={long}, init='epsg:4326".format(
+            lat=(self.min_lat + self.max_lat) / 2,
+            long=(self.min_long + self.max_long) / 2))
+
+    @property
     def longitude_distance(self):
         if self._lon_distance is not None:
             return self._lon_distance
         begin_point = geometry.Point(self.min_long, self.max_lat)
-        my_proj = pyproj.Proj("+proj=utm +lat_0={lat} +lon_0={long}, init='epsg:4326".format(
-            lat=(self.min_lat + self.max_lat) / 2,
-            long=(self.min_long + self.max_long) / 2))
-        UTMx, UTMy = my_proj(begin_point.x, begin_point.y, inverse=False)
 
-        long_plus_5m, _ = my_proj(UTMx + DISTANCE_5_METERS, UTMy, inverse=True)
+        UTMx, UTMy = self.my_proj(begin_point.x, begin_point.y, inverse=False)
+
+        long_plus_5m, _ = self.my_proj(UTMx + DISTANCE_5_METERS, UTMy, inverse=True)
 
         self._lon_distance = abs(self.min_long - long_plus_5m)
         return self._lon_distance
@@ -70,13 +74,10 @@ class Grids(object):
         if self._lat_distance is not None:
             return self._lat_distance
         begin_point = geometry.Point(self.min_long, self.max_lat)
-        my_proj = pyproj.Proj("+proj=utm +lat_0={lat} +lon_0={long}, init='epsg:4326'".format(
-                lat=(self.min_lat + self.max_lat) / 2,
-                long=(self.min_long + self.max_long) / 2))
 
-        UTMx, UTMy = my_proj(begin_point.x, begin_point.y, inverse=False)
+        UTMx, UTMy = self.my_proj(begin_point.x, begin_point.y, inverse=False)
 
-        _, lat_plus_5m = my_proj(UTMx, UTMy + DISTANCE_5_METERS, inverse=True)
+        _, lat_plus_5m = self.my_proj(UTMx, UTMy + DISTANCE_5_METERS, inverse=True)
 
         self._lat_distance = abs(self.max_lat - lat_plus_5m)
         return self._lat_distance
