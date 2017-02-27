@@ -35,5 +35,6 @@ class TestUtils(unittest.TestCase):
                           max_lat=self.latitude + 0.1)
 
     def test_longitude_latitude_distance(self):
-        self.assertEqual(self.Grids.longitude_distance, 5.7986717024505197e-05)
-        self.assertEqual(self.Grids.latitude_distance, 4.503002124778277e-05)
+
+        self.assertEqual(self.Grids.longitude_distance, 5.8699345601098685e-05)
+        self.assertEqual(self.Grids.latitude_distance, 4.443632796835573e-05)

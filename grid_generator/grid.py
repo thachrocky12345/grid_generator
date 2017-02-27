@@ -51,7 +51,7 @@ class Grids(object):
 
     @property
     def my_proj(self):
-        return pyproj.Proj("+proj=utm +lat_0={lat} +lon_0={long}, init='epsg:4326".format(
+        return pyproj.Proj("+proj=eck4 +lat_0={lat} +lon_0={long}, init='epsg:4326".format(
             lat=(self.min_lat + self.max_lat) / 2,
             long=(self.min_long + self.max_long) / 2))
 
