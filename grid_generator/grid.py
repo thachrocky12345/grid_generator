@@ -33,10 +33,11 @@ class Grid(object):
 
     @property
     def polygon(self):
-        min_long = self.long,
-        max_long = self.long + self.longitude_distance,
-        min_lat = self.lat,
+        min_long = self.long
+        max_long = self.long + self.longitude_distance
+        min_lat = self.lat
         max_lat = self.lat - self.latitude_distance
+
         return geometry.Polygon([[min_long, max_lat],
                                  [max_long, max_lat],
                                  [max_long, min_lat],
@@ -67,7 +68,7 @@ class Grids(object):
         if self._grids is not None:
             return self._grids
 
-        self._grids = self.get_grid_polygons
+        self._grids = self._get_grids()
         return self._grids
 
 
@@ -104,32 +105,7 @@ class Grids(object):
         self._lat_distance = abs(self.max_lat - lat_plus_5m)
         return self._lat_distance
 
-    @property
-    def get_grid_points(self):
-        """
-        Collect all the points
-        :param long: from left to right
-        :param lat: from up to down
-        :param points:
-        :return: list of all point sql ready to insert example st_setsrid(
-                            st_point( -94.87, 39.23)
-                            , 4326)
-        """
-        points = []
-        long = self.min_long
-        lat = self.max_lat
-        while lat >= self.min_lat :
-            while long <= self.max_long:
-                points.append(Grid(long, lat))
-                long += self.longitude_distance
-            long = self.min_long
-            lat -= self.latitude_distance
-
-        points.append(Grid(self.max_long, self.min_lat).point_sql)
-        return points
-
-    @property
-    def get_grid_polygons(self):
+    def _get_grids(self):
         """
         Collect all the points
         :param long: from left to right
@@ -139,16 +115,16 @@ class Grids(object):
             'POLYGON((min_long max_lat,max_long max_lat,max_long min_lat,min_long min_lat,min_long max_lat))'::geometry
                               , 4326)
         """
-        polygons = []
+        grids = []
         long = self.min_long
         lat = self.max_lat
         while lat >= self.min_lat:
             while long <= self.max_long:
-                polygons.append(Grid(long, lat, self.longitude_distance, self.latitude_distance))
+                grids.append(Grid(long, lat, self.longitude_distance, self.latitude_distance))
                 long += self.longitude_distance
             long = self.min_long
             lat -= self.latitude_distance
 
-        return polygons
+        return grids
 
 

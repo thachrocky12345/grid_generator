@@ -1,3 +1,6 @@
+from collections import defaultdict
+from datetime import datetime
+
 from shapely import geometry
 from shapely.ops import cascaded_union
 import utils
@@ -5,9 +8,21 @@ import pyproj
 import uom
 from config import db
 
-from sql import select, upsert
+from sql import select, upsert, delete
+
+from grid import Grids
 
 import math
+
+import logging
+
+
+class NullHandler(logging.Handler):
+    def emit(self, record):
+        pass
+
+log = logging.getLogger('IST_TEST')
+log.addHandler(NullHandler())
 
 
 class Angle(object):
@@ -61,6 +76,8 @@ class Field(object):
         self.centroid = centroid
         self.account_device_id = account_device_id
         self.db = db
+        self._map_grid_by_ist_degree_angle = defaultdict(list)
+
 
     @property
     def my_proj(self):
@@ -143,6 +160,44 @@ class Field(object):
         self._field_id = field_info.query_data.id
 
         return self._field_id
+
+    @property
+    def grids(self):
+        if self._grids is not None:
+            return self._grids
+        min_long, min_lat, max_long, max_lat = self.field_polygon.bounds
+        grids = Grids(min_long=min_long, min_lat=min_lat, max_long=max_long, max_lat=max_lat)
+        self._grids = []
+        for grid in grids.grids:
+            if self.field_polygon.intersects(grid.polygon):
+                self.grids.append(grid)
+
+        return self._grids
+
+
+    def import_grids(self):
+
+        log.info("Import grids- total: {}".format(len(self.grids)))
+        # clean before import
+        self.db.modify_rows(delete.clean_grids, dict(field_id=self.field_id))
+
+        insert_values = []
+
+        start_time = datetime.now()
+
+        for grid in self.grids:
+            insert_value = '({},{})'.format(self.field_id, grid.polygon_sql)
+            insert_values.append(insert_value)
+
+        insert_values = ','.join(insert_values)
+        insert_values = upsert.insert_grids.format(values=insert_values)
+
+        self.db.modify_rows(insert_values)
+
+        log.info("Import grids- Run time: {}".format(datetime.now() - start_time))
+
+
+
 
 
 

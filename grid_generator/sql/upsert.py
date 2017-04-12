@@ -13,3 +13,9 @@ INSERT INTO test_ist.field_boundary(account_device_id, geom) values (
 RETURNING id
 
 '''
+
+insert_grids = '''
+
+INSERT INTO test_ist.field_grid(field_boundary_id, geom) values {values}
+
+'''
