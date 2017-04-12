@@ -4,22 +4,44 @@ from shapely import ops, geometry
 
 DISTANCE_5_METERS = 5
 
+DEGREE_LONG_DISTANCE = 5.90079939826e-05
+DEDREE_LAT_DISTANCE = 4.48390108758e-05
+
 
 class Grid(object):
-    def __init__(self, longitude, latitude):
+    def __init__(self, longitude, latitude, longitude_distance=DEGREE_LONG_DISTANCE, latitude_distance=DEDREE_LAT_DISTANCE):
         self.long = longitude
         self.lat = latitude
+        self.longitude_distance = longitude_distance
+        self.latitude_distance = latitude_distance
 
+    @property
     def point_sql(self):
         return '''st_setsrid(st_point({long}, {lat}), 4326)'''.format(long=self.long, lat=self.lat)
 
-    def polygon_sql(self, longitude_distance, latitude_distance):
+    @property
+    def point(self):
+        return geometry.Point(self.long, self.lat)
+
+    @property
+    def polygon_sql(self):
         input = dict(min_long=self.long,
-                     max_long=self.long + longitude_distance,
+                     max_long=self.long + self.longitude_distance,
                      min_lat=self.lat,
-                     max_lat=self.lat - latitude_distance)
+                     max_lat=self.lat - self.latitude_distance)
         return '''st_setsrid('POLYGON(({min_long} {max_lat},{max_long} {max_lat},{max_long} {min_lat},{min_long} {min_lat},{min_long} {max_lat}))'::geometry, 4326)'''.format(**input)
 
+    @property
+    def polygon(self):
+        min_long = self.long,
+        max_long = self.long + self.longitude_distance,
+        min_lat = self.lat,
+        max_lat = self.lat - self.latitude_distance
+        return geometry.Polygon([[min_long, max_lat],
+                                 [max_long, max_lat],
+                                 [max_long, min_lat],
+                                 [min_long, min_lat],
+                                 [min_long, max_lat]])
 
 class Grids(object):
     _grids = None
@@ -122,7 +144,7 @@ class Grids(object):
         lat = self.max_lat
         while lat >= self.min_lat:
             while long <= self.max_long:
-                polygons.append(Grid(long, lat).polygon_sql(self.longitude_distance, self.latitude_distance))
+                polygons.append(Grid(long, lat, self.longitude_distance, self.latitude_distance))
                 long += self.longitude_distance
             long = self.min_long
             lat -= self.latitude_distance

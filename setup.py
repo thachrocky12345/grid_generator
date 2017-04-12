@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='grid_generator',
-    version='1.0.3',
+    version='2.0.1',
     packages=find_packages(exclude=["*.tests", "tests"]),
     package_data={'': ['']},
     install_requires=[
