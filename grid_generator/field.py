@@ -27,6 +27,9 @@ log.addHandler(NullHandler())
 
 class Angle(object):
     def __init__(self):
+        """
+        ist_angles (starts from North) is an ordered list of correct angle (start from East)
+        """
         self._right_ordered_radian = None
         self._ist_ordered_radian = None
 
@@ -77,6 +80,7 @@ class Field(object):
         self.account_device_id = account_device_id
         self.db = db
         self._map_grid_by_ist_degree_angle = defaultdict(list)
+        self._map_field_management_zone_by_id = {}
 
 
     @property
@@ -107,6 +111,15 @@ class Field(object):
         self._y_degree = abs(self.centroid.y - lat)
         return self._y_degree
 
+    def get_angle_polygon(self, angle_degree):
+        """
+        this function will return the polygon (4326) by IST-angle_degree provided in integer
+        :return: polygon
+        """
+
+
+    def get_grids_by_angle(self):
+        pass
 
     @property
     def field_polygon(self):

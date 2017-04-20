@@ -8,6 +8,32 @@ DEGREE_LONG_DISTANCE = 5.90079939826e-05
 DEDREE_LAT_DISTANCE = 4.48390108758e-05
 
 
+from base import Dto, DtoInteger, DtoObject, DtoUom, DtoNumeric
+import uom
+
+
+class DtoFieldGrid(Dto):
+    def __init__(self, **kwargs):
+        Dto.__init__(self)
+        self.add_attr('id', DtoInteger(), read_only=True)
+        self.add_attr('field_boundary_id', DtoInteger(), nullable=False, has_default=False)
+        self.add_attr('geometry', DtoObject())
+        self.add_attr('field_management_zone_id', DtoInteger(), nullable=False, has_default=False)
+        self.add_attr('field_zone_id', DtoInteger(), nullable=False, has_default=False)
+        self.add_attr('depletion', DtoUom(uom.Meter), nullable=False, has_default=True)
+        self.add_attr('accumulated_depletion', DtoUom(uom.Meter), nullable=False, has_default=True)
+        self.add_attr('crop_et_stress', DtoUom(uom.Meter), nullable=False, has_default=True)
+        self.add_attr('accumulated_crop_et_stress', DtoUom(uom.Meter), nullable=False, has_default=True)
+        self.add_attr('available_water', DtoUom(uom.NoUom), nullable=False, has_default=True)
+        self.add_attr('potential_yield_loss', DtoUom(uom.NoUom), nullable=False, has_default=True)
+        self.add_attr('irrigation', DtoUom(uom.Meter), nullable=False, has_default=True)
+        self.add_attr('srid', DtoInteger(), value=4326, read_only=True)
+        self.add_attr('irrigation_start_degree', DtoInteger(), read_only=True)
+        self.add_attr('irrigation_vri_application_point_id', DtoInteger(), read_only=True)
+        self.update(**kwargs)
+
+
+
 class Grid(object):
     def __init__(self, longitude, latitude, longitude_distance=DEGREE_LONG_DISTANCE, latitude_distance=DEDREE_LAT_DISTANCE):
         self.long = longitude
