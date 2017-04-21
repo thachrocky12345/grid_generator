@@ -23,3 +23,13 @@ WHERE
 
 
 '''
+
+
+get_grids_by_angle = '''
+WITH
+
+  Field AS (SELECT st_setsrid(st_geomfromtext(%(polygon_wkt)s), 4326) AS field_boundary_insert)
+
+select * from test_ist.field_grid, Field f where ST_Intersects(f.field_boundary_insert, geom)
+
+'''

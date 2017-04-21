@@ -116,10 +116,29 @@ class Field(object):
         this function will return the polygon (4326) by IST-angle_degree provided in integer
         :return: polygon
         """
+        start_degree = radians.ist_angles[angle_degree - 1]
+        end_degree = radians.ist_angles[angle_degree]
+        list_points = []
 
+        list_points.append(geometry.Point(self.centroid.x + self.x_radius_degree * math.cos(start_degree),
+                                              self.centroid.y + self.y_radius_degree * math.sin(start_degree)))
 
-    def get_grids_by_angle(self):
-        pass
+        list_points.append(geometry.Point(self.centroid.x + self.x_radius_degree * math.cos(end_degree),
+                                          self.centroid.y + self.y_radius_degree * math.sin(end_degree)))
+
+        list_points.append(self.centroid)
+
+        return cascaded_union(list_points).convex_hull
+
+    def get_grids_by_angle(self, angle_degree):
+        sql = select.get_grids_by_angle
+        angle_polygon = self.get_angle_polygon(angle_degree)
+        input = dict(polygon_wkt=angle_polygon.wkt)
+
+        # print sql % (input)
+        ret = self.db.fetch_all_rows(sql, input)
+
+        return ret.query_data
 
     @property
     def field_polygon(self):
